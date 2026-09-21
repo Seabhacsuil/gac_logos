@@ -1,0 +1,26 @@
+name: Update logos.json
+
+on:
+  push:
+    paths:
+      - 'logos/**'
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate logos.json
+        run: |
+          cd logos
+          ls -1 *.png *.jpg *.jpeg *.gif *.svg *.webp 2>/dev/null | jq -R . | jq -s . > logos.json
+          cat logos.json
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add logos/logos.json
+          git diff --staged --quiet || git commit -m "Auto-update logos.json"
+          git push
